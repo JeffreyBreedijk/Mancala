@@ -66,7 +66,7 @@ public class GameStatus {
 			return this;
 		}
 
-		public Builder winner(int val) {
+		public Builder winner(Integer val) {
 			winner = val;
 			return this;
 		}

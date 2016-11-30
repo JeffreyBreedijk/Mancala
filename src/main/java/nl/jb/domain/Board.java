@@ -1,42 +1,53 @@
 package nl.jb.domain;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Board {
 
+
 	private int players;
 	private int numberOfPlayerPits;
-	private Map<String, Pit> pits;
+	private Set<Pit> pits = new TreeSet<>();
 
 	public Board(int stones, int numberOfPlayerPits, int players) {
 		this.players = players;
 		this.numberOfPlayerPits = numberOfPlayerPits;
-		pits = new LinkedHashMap<String, Pit>();
 		for (int p = 0; p < players; p++) {
 			for (int b = 0; b < numberOfPlayerPits; b++) {
-				pits.put(generatePitId(p, b), new Pit(false, p, stones));
+				pits.add(new Pit(false, p, stones, b));
 			}
-			pits.put(p + "." + "m", new Pit(true, p, 0));
+			pits.add(new Pit(true, p, 0, numberOfPlayerPits));
 		}
 	}
 
-	public Map<String, Pit> getPits() {
+	public Set<Pit> getPits() {
 		return pits;
 	}
 
-	public int getStones(String pitId) {
-		Pit pit = pits.get(pitId);
+	public void setPits(Set<Pit> pits) {
+		this.pits = pits;
+	}
+
+	public int getStones(int player, int pitId) {
+		Pit pit = getPit(player, pitId);
 		int stones = pit.getSize();
 		pit.setSize(0);
 		return stones;
 	}
 
-
-	public static String generatePitId(int player, int bin) {
-		return player + "." + bin;
+	public void putStones(int player, int pitId, int stones) {
+		Pit pit = getPit(player, pitId);
+		pit.addStones(stones);
 	}
 
+	public Pit getPit(int player, int pitId) {
+		return pits.stream()
+				.filter(pit -> pit.getPlayer() == player)
+				.filter(pit -> pit.getPitNumber() == pitId)
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("Not a valid pit"));
+	}
 
 
 
